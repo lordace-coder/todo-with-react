@@ -8,7 +8,7 @@ import { FaPlus } from "react-icons/fa";
 
 function App() {
   const input = useRef(); //declare
-  const [count, setCount] = useState(8);
+
   const [todo, setTodo] = useState([]);
 
   return (
