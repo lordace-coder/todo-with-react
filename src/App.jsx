@@ -1,15 +1,22 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./App.css";
 import TodoItem from "./components/TodoItem";
 
-import MyComponent from "./components/MyComponent";
-import PlayGround from "./components/T";
 import { FaPlus } from "react-icons/fa";
+import NoTodo from "./components/NoTodo";
 
 function App() {
-  const input = useRef(); //declare
+  const input = useRef();
 
-  const [todo, setTodo] = useState([]);
+  const [todo, setTodo] = useState(
+    JSON.parse(localStorage.getItem("todos")) ?? []
+  );
+  
+  useEffect(() => {
+    if (todo.length > 0) {
+      localStorage.setItem("todos", JSON.stringify(todo));
+    }
+  });
 
   return (
     // <PlayGround />
@@ -27,8 +34,19 @@ function App() {
 
           <button
             onClick={() => {
-              setTodo([...todo, input.current.value]);
-              input.current.value;
+              // if todo is empty
+
+              if (
+                input.current.value == " " ||
+                input.current.value == "" ||
+                input.current.value == null
+              ) {
+                alert("Todo cant be empty");
+                return;
+              }
+
+              setTodo([input.current.value, ...todo]);
+              input.current.value = null;
             }}
             className="bg-blue-400 text-white p-2 rounded-full
         text-sm hover:bg-blue-600 transition-all
@@ -45,6 +63,8 @@ function App() {
         <p>Completed Todos: {todo.length}</p>
       </div>
 
+      {todo.length == 0 && <NoTodo />}
+
       <div className="px-10 pt-10 flex flex-col gap-5">
         {todo.map((item) => (
           <TodoItem todo={item} />
@@ -55,3 +75,5 @@ function App() {
 }
 
 export default App;
+
+// condition && jsx
