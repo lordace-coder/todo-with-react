@@ -1,41 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import HeroSection from "../components/HeroSection";
+import { db } from "../utils";
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [prod, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
 
-  const featuredProducts = [
-    {
-      id: 1,
-      name: "Wireless Headphones",
-      price: 199.99,
-      rating: 4.5,
-      image: "/api/placeholder/300/300",
-    },
-    {
-      id: 2,
-      name: "Smart Watch",
-      price: 299.99,
-      rating: 4.8,
-      image: "/api/placeholder/300/300",
-    },
-    {
-      id: 3,
-      name: "Laptop Pro",
-      price: 1299.99,
-      rating: 4.9,
-      image: "/api/placeholder/300/300",
-    },
-    {
-      id: 4,
-      name: "Smartphone",
-      price: 899.99,
-      rating: 4.7,
-      image: "/api/placeholder/300/300",
-    },
-  ];
+  useEffect(() => {
+    fetchCategories();
+    fetchProducts();
+    return () => {};
+  }, []);
 
+  const fetchCategories = async () => {
+    const data = await db.listDocuments("categories");
+    console.log(data);
+
+    setCategories(data);
+  };
+
+  const fetchProducts = async () => {
+    const data = await db.listDocuments("products");
+    const res = data.map((i) => i.data);
+    setProducts(res);
+  };
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
@@ -146,7 +136,7 @@ export default function HomePage() {
       <div className="max-w-7xl mx-auto px-4 py-12">
         <h2 className="text-3xl font-bold mb-8">Featured Products</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {featuredProducts.map((product) => (
+          {prod.map((product) => (
             <div
               key={product.id}
               className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
@@ -181,27 +171,20 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8">Shop by Category</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {[
-              "Electronics",
-              "Fashion",
-              "Home",
-              "Beauty",
-              "Sports",
-              "Books",
-            ].map((category) => (
+            {categories.map(({ data: category }) => (
               <div
                 key={category}
                 className="bg-white rounded-lg shadow p-6 text-center hover:shadow-lg transition-shadow cursor-pointer"
               >
                 <div className="text-4xl mb-2">
-                  {category === "Electronics" && "📱"}
-                  {category === "Fashion" && "👕"}
-                  {category === "Home" && "🏠"}
-                  {category === "Beauty" && "💄"}
-                  {category === "Sports" && "⚽"}
-                  {category === "Books" && "📚"}
+                  {category.name === "Electronics" && "📱"}
+                  {category.name === "Fashion" && "👕"}
+                  {category.name === "Home" && "🏠"}
+                  {category.name === "Beauty" && "💄"}
+                  {category.name === "Sports" && "⚽"}
+                  {category.name === "Books" && "📚"}
                 </div>
-                <h3 className="font-semibold">{category}</h3>
+                <h3 className="font-semibold">{category.name}</h3>
               </div>
             ))}
           </div>

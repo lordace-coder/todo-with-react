@@ -1,17 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, Profiler } from "react";
+import { db } from "../utils";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     name: "",
   });
+  useEffect(() => {
+    db.user;
+    console.log(db.isAuthenticated());
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission
     console.log("Form submitted:", formData);
+    if (isLogin) {
+      handleLogin();
+    } else {
+      handleSignUp();
+    }
   };
 
   const handleInputChange = (e) => {
@@ -19,6 +32,48 @@ export default function LoginPage() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleLogin = async () => {
+    // Handle login logic
+    try {
+      console.log("Logging in with:", formData);
+      await db.login(formData.email, formData.password);
+      // navigate to the home page or dashboard
+      navigate("/");
+    } catch (e) {
+      // invalid password or email
+      let detail;
+      try {
+        const parsed = JSON.parse(e.message.replace("Request failed:", ""));
+
+        detail = parsed?.error?.detail;
+      } catch (parseErr) {
+        detail = "Could not parse error message.";
+      }
+      alert(`Login failed: ${detail || "An unknown error occurred."}`);
+    }
+  };
+
+  const handleSignUp = async () => {
+    // Handle sign-up logic
+    try {
+      // upload profile pic to api and get response
+
+      await db.register(formData.email, formData.password, {
+        fullName: formData.name,
+      });
+    } catch (error) {
+      // Handle sign-up error
+      let detail;
+      try {
+        const parsed = JSON.parse(error.message.replace("Request failed:", ""));
+        detail = parsed?.error?.detail;
+      } catch (parseErr) {
+        detail = "Could not parse error message.";
+      }
+      alert(`Sign up failed: ${detail || "An unknown error occurred."}`);
+    }
   };
 
   return (
