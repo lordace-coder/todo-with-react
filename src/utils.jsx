@@ -11,4 +11,6 @@ const db = new Cocobase({
 //   fullName: "John Doe",
 // },"email@gmail.com","password");
 
+db.initAuth()
+// init auth checks if user has been logged in before
 export { db };
